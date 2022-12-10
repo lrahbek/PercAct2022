@@ -1,7 +1,7 @@
 ---
 title: "Motion Lab - instructions"
-author: "Laura Bock Paulsen"
-date: "11/3/2022"
+author: "Cordula Vesper & Laura Bock Paulsen"
+date: "11/4/2022"
 output: html_document
 ---
 
@@ -27,7 +27,7 @@ Instead of their parameters, we use some other (often used) parameters for reach
 ### Loading packages
 For today we will be needing two packages, namely signal and tidyverse. Load them in.
 ```{r}
-pacman::p_load(signal, tidyverse)
+pacman::p_load("signal", "tidyverse")
 ```
 
 
@@ -35,51 +35,108 @@ pacman::p_load(signal, tidyverse)
 To illustrate how you can analyse motion data, 2-3 example files will be used. They can be found in the data folder. Start with just one file (ansuini_8475_3.csv), a grasping action; then later repeat the whole process with the other file (ansuini_8475_4.csv), a throwing action, so we can compare those two different actions. 
 In the end, you can also add a third file (ansuini_8475_2.csv), a pouring action. Note that in this file, there are missing data; however, as they occur later than our section of interest and will, in fact, be filtered out, we can ignore this. 
 ```{r}
-d <- read_csv('ansuini_8475_3.csv') # grasp
-#d <- read_csv('task2_data/ansuini_8475_4.csv') # throw
-#d <- read_csv('task2_data/ansuini_8475_2.csv') # pour
+grasp <- read.csv("data/ansuini_8475_3.csv")
+throw <- read.csv("data/ansuini_8475_4.csv")
+pour <- read.csv("data/ansuini_8475_2.csv")
 ```
 
 ### Initial plotting to understand the data
 To inspect the data create a plot that fulfills the following:
 1) has the frame on the x-axis
 2) X position of the all three markers on the y-axis
-
 Hint: use geom_line for each of the three markers
 ```{r}
-ggplot(d) + 
-  geom_line(aes(frame, wristX), color='blue') + 
-  geom_line(aes(frame, thumbX), color='green') + 
-  geom_line(aes(frame, indexX), color='red')
+p_grasp <- ggplot(grasp)+
+  geom_line(aes(frame, wristX, colour = "Wrist"))+
+  geom_line(aes(frame, indexX, colour = "Index"))+
+  geom_line(aes(frame, thumbX, colour = "Thumb"))+
+  ylab("X position")+
+  theme_minimal()
+
+p_throw <- ggplot(throw)+
+  geom_line(aes(frame, wristX, colour = "Wrist"))+
+  geom_line(aes(frame, indexX, colour = "Index"))+
+  geom_line(aes(frame, thumbX, colour = "Thumb"))+
+  ylab("X position")+
+  theme_minimal()
+
+p_pour <- ggplot(pour)+
+  geom_line(aes(frame, wristX, colour = "Wrist"))+
+  geom_line(aes(frame, indexX, colour = "Index"))+
+  geom_line(aes(frame, thumbX, colour = "Thumb"))+
+  ylab("X position")+
+  theme_minimal()
+
+
+
+gridExtra::grid.arrange(p_grasp, p_throw, p_pour)
 ```
 
 #### Cleaning the data
 From the plot you have just made you might see that the frame does not start at 0. Modify the frame variable in such a way that it starts at 0 and increases with 1 for each frame recorded.
 ```{r}
-d$frame = d$frame - d$frame[1]
+grasp <- grasp %>% 
+  mutate("frame" = frame - frame[1])
+throw <- throw %>% 
+  mutate("frame" = frame - frame[1])
+pour <- pour %>% 
+  mutate("frame" = frame - frame[1])
 ```
 
 Do the same for the timestamp. However, let's clean up the timestamp a little so that we can more easily interpret the numbers. Make a new column called 'time' that is the timestamp divided by 1000000. This will give us the time in seconds. (To check: Our sample rate is 300 Hz, so after 300 frames, we should have reached one second.)
 ```{r}
-d <- d %>%
-  mutate('time' = (d$timestamp-d$timestamp[1])/1000000)
+grasp <- grasp %>% 
+  mutate("timestamp" = timestamp - timestamp[1]) %>% 
+  mutate("time" = timestamp/1000000)
+
+throw <- throw %>% 
+  mutate("timestamp" = timestamp - timestamp[1]) %>% 
+  mutate("time" = timestamp/1000000)
+
+pour <- pour %>% 
+  mutate("timestamp" = timestamp - timestamp[1]) %>% 
+  mutate("time" = timestamp/1000000)
 ```
 
 Similarly, let's make the position data more meaningful. By dividing by 10, we get the values in cm. Do this for all the four markers and all three dimensions. (Although we only use index finger and thumb in the following.)
 ```{r}
-d$refX = d$refX/10 
-d$refY = d$refY/10 
-d$refZ = d$refZ/10 
-d$wristX = d$wristX/10 
-d$wristY = d$wristY/10 
-d$wristZ = d$wristZ/10 
-d$thumbX = d$thumbX/10 
-d$thumbY = d$thumbY/10 
-d$thumbZ = d$thumbZ/10 
-d$indexX = d$indexX/10 
-d$indexY = d$indexY/10 
-d$indexZ = d$indexZ/10
+grasp <- grasp %>% 
+  mutate(indexX = indexX/10, 
+         indexY = indexY/10,
+         indexZ = indexZ/10,
+         wristX = wristX/10,
+         wristY = wristY/10,
+         wristZ = wristZ/10,
+         thumbX = thumbX/10,
+         thumbY = thumbY/10,
+         thumbZ = thumbZ/10,
+         )
+
+throw <- throw %>% 
+  mutate(indexX = indexX/10, 
+         indexY = indexY/10,
+         indexZ = indexZ/10,
+         wristX = wristX/10,
+         wristY = wristY/10,
+         wristZ = wristZ/10,
+         thumbX = thumbX/10,
+         thumbY = thumbY/10,
+         thumbZ = thumbZ/10,
+         )
+
+pour <- pour %>% 
+  mutate(indexX = indexX/10, 
+         indexY = indexY/10,
+         indexZ = indexZ/10,
+         wristX = wristX/10,
+         wristY = wristY/10,
+         wristZ = wristZ/10,
+         thumbX = thumbX/10,
+         thumbY = thumbY/10,
+         thumbZ = thumbZ/10,
+         )
 ```
+
 
 
 ## Cool calculations!!!
@@ -92,16 +149,16 @@ Remind yourself of how to calculate the velocities. Create a new column in the d
 * Velocity for the first point can be set to 0. Question: Why is such a trick needed? 
 * ?diff()
 ```{r}
-# velocity
-d <- d %>% mutate('indexXvel' =  c(0,  diff(indexX) / diff(time))) 
+grasp <- grasp %>% 
+  mutate("IndexXvel" = c(0,  diff(indexX) / diff(time)))
 ```
 
 
 #### Plot the velocity over time! 
 ```{r}
-ggplot(d) + 
-  geom_line(aes(time, indexXvel), color='blue') +
-  ylab('velocity (cm/s)')
+ggplot(grasp)+
+  geom_line(aes(time, IndexXvel))+
+  theme_minimal()
 ```
 
 #### Filter the velocity
@@ -111,36 +168,37 @@ Create a new column with the filtered velocity. Plot again after filtering and o
 
 Afterwards, repeat these two steps to play around with different filter cutoffs. Observe what changing the value does to the raw data. 
 ```{r}
-filter_cutoff <- 0.05
-bf <- butter(2, filter_cutoff, type ='low') 
+bf = butter(2, 0.05, type = "low")
+grasp <- grasp %>% 
+  mutate("filt_indexXvel" = filtfilt(bf, IndexXvel))
 
-d <- d %>% mutate('indexXvel_f' = filtfilt(bf, indexXvel))
+ggplot(grasp)+
+  geom_line(aes(time, IndexXvel))+
+  geom_line(aes(time, filt_indexXvel), colour = "red")
+
 ```
 
-```{r}
-ggplot(d) + 
-  geom_line(aes(time, indexXvel), color='red') +
-  geom_line(aes(time, indexXvel_f), color='blue')
-```
 
 ### Acceleration of the index finger
 Now calculate the acceleration of the index finger along the x-axis using the filtered velocity. 
 ```{r}
-d <- d %>% 
-  mutate('indexXacc' =  c(0, diff(indexXvel_f) / diff(time))) 
+grasp <- grasp %>% 
+  mutate('indexXacc' =  c(0, diff(filt_indexXvel) / diff(time))) 
 ```
+
 
 Now filter the acceleration. You can normally use the same filter parameters as for velocity. 
 ```{r}
-d <- d %>% 
-  mutate('indexXacc_f' = filtfilt(bf, indexXacc))
+grasp <- grasp %>% 
+  mutate("filt_indexXacc" = filtfilt(bf, indexXacc))
 ```
+
 
 Plot both the filtered and unfiltered.
 ```{r}
-ggplot(d) + 
-  geom_line(aes(time, indexXacc), color='red') +
-  geom_line(aes(time, indexXacc_f), color='blue')
+ggplot(grasp)+
+  geom_line(aes(time, indexXacc))+
+  geom_line(aes(time, filt_indexXacc), colour = "red")
 ```
 
 
@@ -150,37 +208,41 @@ ggplot(d) +
 ### Velocity of the index finger in 3D space
 Now that we have understood velocity and acceleration in one dimension, let's make it three-dimensional. Find the formula for calculating velocity in three dimensional space, and use it to do so.
 ```{r}
-d <- d %>%  mutate('indexvel' =  c(0, sqrt(diff(indexX)^2 + diff(indexY)^2 + diff(indexZ)^2) / diff(time))) 
+grasp <-  grasp %>% 
+  mutate('indexvel' =  c(0, sqrt(diff(indexX)^2 + diff(indexY)^2 + diff(indexZ)^2) / diff(time)))
 ```
 
 Filter it!
 ```{r}
-d <- d %>%mutate('indexvel_f' = filtfilt(bf, indexvel))
+grasp <- grasp %>% 
+  mutate("filt_indexvel" = filtfilt(bf, indexvel))
 ```
 
 Plot both filtered and unfiltered!
 ```{r}
-ggplot(d) + 
-  geom_line(aes(time, indexvel), color='black') +
-  geom_line(aes(time, indexvel_f), color='red')  
+ggplot(grasp)+
+  geom_line(aes(time, indexvel))+
+  geom_line(aes(time, filt_indexvel), colour = "red")
 ```
 
 ### Acceleration of the index finger in 3D space
 From the 3d-velocity, derive the 3d-acceleration.
 ```{r}
-d <- d %>% mutate('indexacc' = c(0, diff(indexvel_f) / diff(time)))
+grasp <- grasp %>% 
+  mutate('indexacc' =  c(0, diff(filt_indexvel) / diff(time))) 
 ```
 
 Filter!
 ```{r}
-d <- d %>%mutate('indexacc_f' = filtfilt(bf, indexacc))
+grasp <- grasp %>% 
+  mutate("filt_indexacc" = filtfilt(bf, indexacc))
 ```
 
 Plot both filtered and unfiltered!
 ```{r}
-ggplot(d) +
-  geom_line(aes(time, indexacc), color='black') +
-  geom_line(aes(time, indexacc_f), color='red')  
+ggplot(grasp)+
+  geom_line(aes(time, indexacc))+
+  geom_line(aes(time, filt_indexacc), colour = "red")
 ```
 
 
@@ -192,8 +254,8 @@ The goal is to have a column with TRUE and FALSE which indicates whether it is a
 **Hints**
 * diff and sign are useful functions (also in combination :))
 ```{r}
-d <- d %>% 
-  mutate('indexzcr' =  c(0, diff(sign(indexacc_f)))) %>% 
+grasp <- grasp %>% 
+  mutate('indexzcr' =  c(0, diff(sign(filt_indexacc))))%>% 
   mutate('indexzcrMin' = indexzcr==2) %>%
   mutate('indexzcrMax' = indexzcr==-2) 
 ```
@@ -201,26 +263,26 @@ d <- d %>%
 
 Plot the filtered velocity and add points at the minima and maxima using the acceleration zero crossings from before.
 ```{r}
-ggplot(d) + 
-  geom_line(aes(time, indexvel_f), color='red') +
-  geom_point(aes(time, indexvel_f), color='blue', data=subset(d,indexzcrMin==TRUE)) +
-  geom_point(aes(time, indexvel_f), color='green', data=subset(d,indexzcrMax==TRUE))
+ggplot(grasp) + 
+  geom_line(aes(time, filt_indexvel), color='red') +
+  geom_point(aes(time, filt_indexvel), color='blue', data=subset(grasp,indexzcrMin==TRUE)) +
+  geom_point(aes(time, filt_indexvel), color='green', data=subset(grasp,indexzcrMax==TRUE))
 ```
 
 
 Correspondingly, plot these velocity minimum and maximum points onto the trajectory of the index finger (either just x or all three dimensions). 
 Question: What, then, do these points we found tell us about the actual movement, esp. in relation to our task? Which points / parts of the trajectory seem most relevant? 
 ```{r}
-ggplot(d) + 
+ggplot(grasp) + 
   geom_line(aes(time, indexX), color='black') +
-  geom_point(aes(time, indexX), color='blue', data=subset(d,indexzcrMin==TRUE)) +
-  geom_point(aes(time, indexX), color='green', data=subset(d,indexzcrMax==TRUE)) +
+  geom_point(aes(time, indexX), color='blue', data=subset(grasp,indexzcrMin==TRUE)) +
+  geom_point(aes(time, indexX), color='green', data=subset(grasp,indexzcrMax==TRUE)) +
   geom_line(aes(time, indexY), color='red') +
-  geom_point(aes(time, indexY), color='blue', data=subset(d,indexzcrMin==TRUE)) +
-  geom_point(aes(time, indexY), color='green', data=subset(d,indexzcrMax==TRUE)) +
+  geom_point(aes(time, indexY), color='blue', data=subset(grasp,indexzcrMin==TRUE)) +
+  geom_point(aes(time, indexY), color='green', data=subset(grasp,indexzcrMax==TRUE)) +
   geom_line(aes(time, indexZ), color='purple') +
-  geom_point(aes(time, indexZ), color='blue', data=subset(d,indexzcrMin==TRUE)) +
-  geom_point(aes(time, indexZ), color='green', data=subset(d,indexzcrMax==TRUE))
+  geom_point(aes(time, indexZ), color='blue', data=subset(grasp,indexzcrMin==TRUE)) +
+  geom_point(aes(time, indexZ), color='green', data=subset(grasp,indexzcrMax==TRUE))
 
 ```
 
@@ -232,63 +294,52 @@ Hint:
 * the start of the reaching phase is the velocity minimum that has the highest frame number in the first phase (i.e. trialPhase==1, i.e. right before leaving the starting position)
 * the end of the reaching phase is the velocity minimum that has the smallest frame number in the second phase (i.e. trialPhase==2, i.e. right after having left the start position)
 ```{r}
-# Start and end points
-reachStart = max(subset(d, trialPhase==1 & indexzcrMin==TRUE)$frame)
-reachEnd = min(subset(d, trialPhase==2 & indexzcrMin==TRUE)$frame)
+
 ```
 
 
 #### Plotting the reach phase!
 Create a plot with only the reach phase as position over time  
 ```{r}
-ggplot(d[reachStart:reachEnd,]) + 
-  geom_line(aes(time, indexX))
+
 ```
 
 #### Determine the movement onset
 ```{r}
-movementOnset <- d$time[reachStart] - d$time[1]
+
 ```
 
 
 #### Determine the reach duration 
 ```{r}
-reachDuration <- d$time[reachEnd] - d$time[reachStart] 
+
 ```
 
 #### Determine peak velocity with the reach phase
 ```{r}
-peakReachVelocity <-  max(d$indexvel_f[reachStart:reachEnd])
+
 ```
 
 #### Determine max reach height with the reach phase
 ```{r}
-maxReachHeight <-  max(d$indexZ[reachStart:reachEnd])
+
 ```
 
 #### Determine the thumb-index aperture
 Create a new column with distance between the thumb and index finger.
 ```{r}
-d <- d %>% mutate('aperture' = sqrt((indexX-thumbX)^2 + (indexY-thumbY)^2 + (indexZ-thumbZ)^2)) 
+
 ```
 
 #### Determine the maximum thumb-index aperture in the reaching phase
 ```{r}
-maxReachAperture = max(d$aperture[reachStart:reachEnd])
+
 ```
 
 
+Export general file information like subjID, trial and cond along with your 5 kinematic parameters. After you preprocessed all three demo files, you can load these files with your summary data and plot (or, if we had more data, analyze) them.
 ```{r}
-# general file information
-subjID = d$subjID[1] 
-trial = d$trial[1]
-cond = d$cond[1]
 
-all_data <- data.frame(subjID, trial, cond, movementOnset, reachDuration, peakReachVelocity, maxReachHeight, maxReachAperture)
-
-  
-print(all_data)
-write_csv(all_data, paste('ansuini_preprocessed_', subjID, '_', trial, '.csv', sep=""))
 ```
 
 

@@ -1,7 +1,7 @@
 ---
 API: 2.1
-OpenSesame: 3.3.8
-Platform: posix
+OpenSesame: 3.3.12
+Platform: nt
 ---
 set width 1024
 set uniform_coordinates yes
@@ -23,7 +23,7 @@ set font_size 18
 set font_italic no
 set font_family mono
 set font_bold no
-set experiment_path "/Users/au592397/OneDrive - Aarhus Universitet/TeachingAU/E21 Perception and Action"
+set experiment_path "C:/LAURA/UNI/3rd_semester/Perception_and_action/PercAct2022/mousetracking/example_experiments"
 set disable_garbage_collection yes
 set description "A template containing a practice and an experimental phase"
 set coordinates uniform
@@ -45,27 +45,27 @@ define loop block_loop
 	set column_order ""
 	set break_if_on_first yes
 	set break_if never
-	setcycle 0 left_color "#fc0107"
+	setcycle 0 left_color FEMALE
 	setcycle 0 left_shape circle
-	setcycle 0 right_color "#fc0107"
+	setcycle 0 right_color "MALE "
 	setcycle 0 right_shape rectangle
 	setcycle 0 trial_type similar
 	setcycle 0 correct_response left_button
-	setcycle 1 left_color "#fc0107"
+	setcycle 1 left_color MALE
 	setcycle 1 left_shape circle
-	setcycle 1 right_color "#20ffff"
+	setcycle 1 right_color MALE
 	setcycle 1 right_shape rectangle
 	setcycle 1 trial_type dissimilar
 	setcycle 1 correct_response left_button
-	setcycle 2 left_color "#fc0107"
+	setcycle 2 left_color MALE
 	setcycle 2 left_shape rectangle
-	setcycle 2 right_color "#fc0107"
+	setcycle 2 right_color MALE
 	setcycle 2 right_shape circle
 	setcycle 2 trial_type similar
 	setcycle 2 correct_response right_button
-	setcycle 3 left_color "#20ffff"
+	setcycle 3 left_color MALE
 	setcycle 3 left_shape rectangle
-	setcycle 3 right_color "#fc0107"
+	setcycle 3 right_color MALE
 	setcycle 3 right_shape circle
 	setcycle 3 trial_type dissimilar
 	setcycle 3 correct_response right_button
@@ -159,7 +159,7 @@ define sketchpad stimuli
 	draw rect color="[left_color]" fill=1 h=128 penwidth=1 show_if="[left_shape]==rectangle" w=128 x=-416 y=-320 z_index=0
 	draw rect color="[right_color]" fill=1 h=128 penwidth=1 show_if="[right_shape]==rectangle" w=128 x=288 y=-320 z_index=0
 	draw rect color="#ffffff" fill=0 h=192 name=left_button penwidth=1 show_if=always w=192 x=-448.0 y=-352.0 z_index=0
-	draw rect color="#ffffff" fill=0 h=192 name=right_button penwidth=1 show_if=always w=192 x=256.0 y=-352.0 z_index=0
+	draw rect color="#ffffff" fill=0 h=192 name=right_button penwidth=1 show_if=always w=192 x=256 y=-352 z_index=0
 
 define sequence trial_sequence
 	set flush_keyboard yes
